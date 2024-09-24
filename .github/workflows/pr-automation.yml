@@ -21,8 +21,9 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build with Gradle (Optimized)
+        run: ./gradlew build --parallel --daemon --build-cache -x test
+
 
       - name: Run tests
         run: ./gradlew test
