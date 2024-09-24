@@ -1,4 +1,3 @@
-# .github/workflows/pr-automation.yml
 name: PR Automation
 
 on:
@@ -6,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches:
-      - feature/*
+      - feature/*  # feature/* 브랜치에 푸시될 때 자동 PR 생성
 
 jobs:
   pr_checks:
@@ -36,3 +35,18 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"body":"Tests failed. Please review the logs."}' \
             https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
+
+  create_pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'  # push 이벤트 발생 시 실행
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          branch: "auto-pr-branch-${{ github.sha }}"  # 새 브랜치 생성
+          base: "master"  # PR 대상 브랜치
+          title: "Automated PR from feature branch"
+          body: "This PR was automatically generated from changes in feature branch."
