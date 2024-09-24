@@ -8,9 +8,9 @@ on:
       - feature/*  # feature/* 브랜치에 푸시될 때 자동 PR 생성
 
 jobs:
+  # PR이 생성되거나 PR 관련 이벤트가 발생했을 때 빌드 및 테스트 수행
   pr_checks:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -36,9 +36,11 @@ jobs:
             -d '{"body":"Tests failed. Please review the logs."}' \
             https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
 
+  # Push가 발생했을 때 PR을 자동으로 생성하는 작업
   create_pr:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'  # push 이벤트 발생 시 실행
+    needs: pr_checks  # PR 체크 작업 후에 실행되도록 설정
+    if: github.event_name == 'push'  # push 이벤트가 발생한 경우에만 실행
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
