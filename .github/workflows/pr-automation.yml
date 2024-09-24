@@ -1,0 +1,35 @@
+# .github/workflows/pr-automation.yml
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Add a comment on PR if tests fail
+        if: failure()
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"body":"Tests failed. Please review the logs."}' \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
