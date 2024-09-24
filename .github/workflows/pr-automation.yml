@@ -4,6 +4,9 @@ name: PR Automation
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - feature/*
 
 jobs:
   pr_checks:
