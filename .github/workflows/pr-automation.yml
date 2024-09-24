@@ -49,7 +49,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          branch: "auto-pr-branch-${{ github.sha }}"  # 새 브랜치 생성
+          branch: ${{ github.ref }} # 새 브랜치 생성
           base: "master"  # PR 대상 브랜치
           title: "Automated PR from feature branch"
           body: "This PR was automatically generated from changes in feature branch."
